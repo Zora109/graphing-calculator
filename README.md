@@ -2,5 +2,5 @@
 
 Instructions:
 
-- [Part 1](https://docs.google.com/document/d/1wLaS0PX1LKwEgiwMAFYVoITLA4Y4VIm2Qe_A9Rolqjo/edit?usp=sharing)
-- [Part 2](https://docs.google.com/document/d/1JwW6sBtLPmJKukz_aG6Nvts7R2sjxtUBMEcOlqUuyLQ/edit?usp=sharing)
+- [Part 1](https://comp127.innig.net/activities/graphing_calculator_1)
+- [Part 2](https://comp127.innig.net/activities/graphing_calculator_2)
