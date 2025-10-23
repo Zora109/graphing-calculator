@@ -3,6 +3,8 @@ package graphingcalculator;
 import edu.macalester.graphics.CanvasWindow;
 import edu.macalester.graphics.Line;
 import edu.macalester.graphics.Point;
+import edu.macalester.graphics.events.ModifierKey;
+import edu.macalester.graphics.ui.Button;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ public class GraphingCalculator {
     private double xmin, xmax, step;  // computed from origin + scale + size
     private double animationParameter;
     private Line xaxis, yaxis;
+    private boolean animating = true;
+    private double animationSpeed = 0.01;
 
     /**
      * Creates a new graphing calculator with its own window.
@@ -35,9 +39,31 @@ public class GraphingCalculator {
 
         coordinatesChanged();
 
-        canvas.animate(() ->
-            setAnimationParameter(
-                getAnimationParameter() + 0.01));
+        Button zoomIn = new Button("Zoom In");
+        Button zoomOut = new Button("Zoom Out");
+        canvas.add(zoomIn, 10, 10);
+        canvas.add(zoomOut, zoomIn.getBoundsInParent().getMaxX(), 10);
+        zoomIn.onClick(() -> setScale(getScale() * 1.5));
+        zoomOut.onClick(() -> setScale(getScale() / 1.5));
+
+        canvas.onMouseDown(event -> animating = false);
+        canvas.onMouseUp(event -> animating = true);
+        canvas.onDrag(event -> {
+            if (event.getModifiers().contains(ModifierKey.SHIFT)) {
+                setOrigin(getOrigin().add(event.getDelta()));
+            } else {
+                double animDelta = event.getDelta().getX() / width;
+                setAnimationParameter(animDelta + getAnimationParameter());
+                animationSpeed = (animationSpeed + animDelta) / 2;
+            }
+        });
+
+        canvas.animate(() -> {
+            if (animating) {
+                setAnimationParameter(
+                    getAnimationParameter() + animationSpeed);
+            }
+        });
     }
 
     /**
@@ -97,6 +123,10 @@ public class GraphingCalculator {
     }
 
     public void setScale(double scale) {
+        origin = origin
+            .subtract(canvas.getCenter())
+            .scale(scale / this.scale)
+            .add(canvas.getCenter());
         this.scale = scale;
         coordinatesChanged();
     }
@@ -149,6 +179,17 @@ public class GraphingCalculator {
     public static void main(String[] args) {
         GraphingCalculator calc = new GraphingCalculator(800, 600);
 
-        // TODO: add equations
+        for (int n = 1; n < 12; n++) {
+            double base = n * 0.1 + 1.5;
+            calc.show((x, t) -> {
+                double result = 0;
+                for (int i = 1; i < 20; i++) {
+                    result += Math.sin(x * Math.pow(base, i) - t * i * 3)
+                                / Math.pow(base, i);
+                }
+                return result;
+            });
+        }
+
     }
 }
